@@ -1,0 +1,10 @@
+*.properties
+!*.properties.example
+*.env
+.env*
+secrets/
+credentials/
+*.jks
+*.p12
+*.pem
+*.key
