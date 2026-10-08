@@ -1,0 +1,12 @@
+security.protocol=SSL
+
+ssl.truststore.location=/etc/ssl/kafka/app-client-truststore.p12
+ssl.truststore.password=<CLIENT_TRUSTSTORE_PASSWORD>
+ssl.truststore.type=PKCS12
+
+ssl.keystore.location=/etc/ssl/kafka/app-client.p12
+ssl.keystore.password=<CLIENT_KEYSTORE_PASSWORD>
+ssl.keystore.type=PKCS12
+ssl.key.password=<CLIENT_KEYSTORE_PASSWORD>
+
+ssl.endpoint.identification.algorithm=https
