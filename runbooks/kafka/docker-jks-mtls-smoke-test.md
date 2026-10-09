@@ -4,24 +4,75 @@ This runbook covers validating a Spring Boot JAR in Docker before deploying it t
 
 The preferred test pattern is to build an application image first, then run that image with the JKS files mounted read-only. This more closely matches the final deployment model than launching a JAR directly from a generic Java base image.
 
+## Application configuration model
+
+A common Spring Boot pattern is to keep the packaged `application.yml` generic and inject all environment-specific values through environment variables, for example:
+
+```yaml
+spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME}
+
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: ${DATABASE_DRIVER}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_URL}
+
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL}
+      ssl.endpoint.identification.algorithm: "${KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM}"
+
+    ssl:
+      trust-store-location: ${KAFKA_TRUSTSTORE_LOCATION}
+      trust-store-password: ${KAFKA_TRUSTSTORE_PASSWORD}
+      trust-store-type: ${KAFKA_TRUSTSTORE_TYPE}
+      key-store-location: ${KAFKA_KEYSTORE_LOCATION}
+      key-store-password: ${KAFKA_KEYSTORE_PASSWORD}
+      key-store-type: ${KAFKA_KEYSTORE_TYPE}
+      key-password: ${KAFKA_KEY_PASSWORD}
+
+server:
+  port: ${SERVER_PORT}
+```
+
+When the application already maps custom `KAFKA_*` variables directly, avoid adding a second parallel set of `SPRING_KAFKA_*` environment variables unless the application genuinely needs them. Duplicate configuration paths make it harder to determine which value won at runtime.
+
 ## Expected environment variables
 
 Typical application-specific variables:
 
 ```text
+SPRING_APPLICATION_NAME
 DATABASE_URL
 DATABASE_USER
 DATABASE_PASSWORD
+DATABASE_DRIVER
+HIBERNATE_DIALECT
+HIBERNATE_SHOW_SQL
 KAFKA_URL
 KAFKA_SECURITY_PROTOCOL
+KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM
 KAFKA_TRUSTSTORE_LOCATION
 KAFKA_TRUSTSTORE_PASSWORD
+KAFKA_TRUSTSTORE_TYPE
 KAFKA_KEYSTORE_LOCATION
 KAFKA_KEYSTORE_PASSWORD
+KAFKA_KEYSTORE_TYPE
 KAFKA_KEY_PASSWORD
+KAFKA_PRODUCER_KEY_SERIALIZER
+KAFKA_PRODUCER_VALUE_SERIALIZER
+KAFKA_TRUSTED_PACKAGES
+KAFKA_CONSUMER_GROUP_ID
+KAFKA_CONSUMER_AUTO_OFFSET_RESET
+KAFKA_CONSUMER_KEY_DESERIALIZER
+KAFKA_CONSUMER_VALUE_DESERIALIZER
+SERVER_PORT
+KAFKA_TOPIC_NAME
 ```
-
-Some Spring Boot applications also consume the equivalent `SPRING_KAFKA_*` properties directly. If both configuration paths exist in the application, keep them aligned during migration testing so the application cannot silently fall back to an old bootstrap server or security protocol.
 
 ## Suggested layout
 
@@ -94,10 +145,12 @@ WORKDIR /app
 
 COPY transaction-analysis.jar /app/app.jar
 
-EXPOSE 8989
+EXPOSE 8080
 
 ENTRYPOINT ["java","-jar","/app/app.jar"]
 ```
+
+`EXPOSE` is documentation only; the actual reachable host port is controlled by Compose or `docker run` port mapping.
 
 Build the reusable application image:
 
@@ -131,30 +184,43 @@ For a simple Compose-based test, one `.env` file can be used both for Compose va
 Example:
 
 ```env
-HOST_IP=<docker-host-ip>
+SPRING_APPLICATION_NAME=TransactionAnalysis
 
 DATABASE_URL=jdbc:postgresql://<db-host>:5432/<db>
 DATABASE_USER=<db-user>
 DATABASE_PASSWORD=<secret>
+DATABASE_DRIVER=org.postgresql.Driver
+
+HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+HIBERNATE_SHOW_SQL=true
 
 KAFKA_URL=<broker-1>:18443,<broker-2>:18443,<broker-3>:18443
 KAFKA_SECURITY_PROTOCOL=SSL
-KAFKA_TRUSTSTORE_LOCATION=file:/etc/kafka-certs/kafka.truststore.jks
+KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM=https
+
+KAFKA_TRUSTSTORE_LOCATION=/etc/kafka-certs/kafka.truststore.jks
 KAFKA_TRUSTSTORE_PASSWORD='<secret>'
-KAFKA_KEYSTORE_LOCATION=file:/etc/kafka-certs/kafka.keystore.jks
+KAFKA_TRUSTSTORE_TYPE=JKS
+
+KAFKA_KEYSTORE_LOCATION=/etc/kafka-certs/kafka.keystore.jks
 KAFKA_KEYSTORE_PASSWORD='<secret>'
+KAFKA_KEYSTORE_TYPE=JKS
 KAFKA_KEY_PASSWORD='<secret>'
 
-SPRING_KAFKA_BOOTSTRAP_SERVERS=<broker-1>:18443,<broker-2>:18443,<broker-3>:18443
-SPRING_KAFKA_PROPERTIES_SECURITY_PROTOCOL=SSL
-SPRING_KAFKA_PROPERTIES_SSL_TRUSTSTORE_LOCATION=file:/etc/kafka-certs/kafka.truststore.jks
-SPRING_KAFKA_PROPERTIES_SSL_TRUSTSTORE_PASSWORD='<secret>'
-SPRING_KAFKA_PROPERTIES_SSL_TRUSTSTORE_TYPE=JKS
-SPRING_KAFKA_PROPERTIES_SSL_KEYSTORE_LOCATION=file:/etc/kafka-certs/kafka.keystore.jks
-SPRING_KAFKA_PROPERTIES_SSL_KEYSTORE_PASSWORD='<secret>'
-SPRING_KAFKA_PROPERTIES_SSL_KEYSTORE_TYPE=JKS
-SPRING_KAFKA_PROPERTIES_SSL_KEY_PASSWORD='<secret>'
+KAFKA_PRODUCER_KEY_SERIALIZER=org.apache.kafka.common.serialization.StringSerializer
+KAFKA_PRODUCER_VALUE_SERIALIZER=org.springframework.kafka.support.serializer.JsonSerializer
+KAFKA_TRUSTED_PACKAGES=*
+
+KAFKA_CONSUMER_GROUP_ID=<consumer-group>
+KAFKA_CONSUMER_AUTO_OFFSET_RESET=latest
+KAFKA_CONSUMER_KEY_DESERIALIZER=org.apache.kafka.common.serialization.StringDeserializer
+KAFKA_CONSUMER_VALUE_DESERIALIZER=org.apache.kafka.common.serialization.StringDeserializer
+
+SERVER_PORT=8080
+KAFKA_TOPIC_NAME=<topic-name>
 ```
+
+Kafka's `ssl.keystore.location` and `ssl.truststore.location` ultimately expect normal filesystem paths. If runtime logs show Kafka attempting to open a literal path such as `file:/etc/...`, switch the injected values to `/etc/...`.
 
 If a secret contains characters such as `#`, `$`, `!`, or spaces, quote it so Compose does not parse part of the value as syntax.
 
@@ -179,7 +245,7 @@ services:
     networks:
       - appnet
     ports:
-      - "8989:8989"
+      - "8989:8080"
     env_file:
       - ./.env
     volumes:
@@ -200,6 +266,21 @@ networks:
 ```
 
 This isolates the migration: the new application can use the mTLS listener while another application continues using its existing listener.
+
+## Validate the actual application port
+
+Do not trust the Dockerfile `EXPOSE` value or an assumed source property. Verify the process inside the running container:
+
+```bash
+docker exec transaction-analysis-service sh -c 'ss -lntp 2>/dev/null || netstat -lntp 2>/dev/null'
+```
+
+If Java is listening on container port `8080`, a host mapping such as `8989:8989` is wrong. Use:
+
+```yaml
+ports:
+  - "8989:8080"
+```
 
 ## Validate Compose before starting
 
@@ -227,20 +308,56 @@ Look for:
 
 - successful Spring Boot startup
 - PostgreSQL connectivity
-- Kafka metadata/cluster connection
-- the intended broker list
+- intended Kafka bootstrap servers
 - `security.protocol=SSL`
+- `ssl.endpoint.identification.algorithm=https`
 - JKS keystore/truststore paths
+- Kafka cluster metadata
+- consumer-group join
+- partition assignment
 - no `SSLHandshakeException`
 - no missing-keystore/truststore errors
 
-A container being `Up` is not sufficient proof. The application must actually establish the Kafka connection and, where possible, successfully consume or produce a test message.
+Useful validation filter:
+
+```bash
+docker logs transaction-analysis-service 2>&1 | grep -Ei 'Cluster ID|joined group|Successfully joined|assignment|assigned|SSLHandshakeException|authentication|disconnect|ERROR|WARN'
+```
+
+Strong evidence of a successful mTLS consumer connection includes:
+
+```text
+Cluster ID: <expected-cluster-id>
+Successfully joined group
+Finished assignment for group
+Adding newly assigned partitions
+partitions assigned
+```
+
+If the broker requires client certificates and the application reaches metadata, joins the group, and receives partition assignments over the mTLS listener, the client keystore/private-key identity and truststore are functioning correctly.
+
+A container being `Up` is not sufficient proof. The strongest final validation is still a real business/test message being consumed or produced successfully.
 
 ## Common failures
+
+### Kafka throws `NoSuchFileException: file:/etc/...`
+
+The application passed a URI-style string into Kafka's filesystem-based SSL configuration. Inject a normal path instead:
+
+```text
+/etc/kafka-certs/kafka.keystore.jks
+/etc/kafka-certs/kafka.truststore.jks
+```
 
 ### `FileNotFoundException` for `/etc/kafka-certs/...`
 
 The volume mount, filename, or configured path does not match.
+
+Verify the files inside the container:
+
+```bash
+docker compose run --rm --entrypoint sh transaction-analysis-service -c 'ls -lah /etc/kafka-certs'
+```
 
 ### Keystore/truststore password error
 
@@ -248,11 +365,19 @@ Verify the same files interactively with `keytool` outside the container before 
 
 ### Hostname verification failure
 
-The broker certificate SAN must match the hostname or IP used in the bootstrap server list. Do not disable endpoint verification as a shortcut.
+The broker certificate SAN must match the hostname or IP used in the bootstrap server list. Keep endpoint identification set to `https`; do not disable hostname verification as a shortcut.
 
 ### App starts but Kafka never connects
 
 Confirm the application actually maps the supplied environment variables into Kafka client properties. Inspect runtime producer/consumer configuration rather than assuming the intended variables are consumed.
+
+### Host port is mapped to the wrong container port
+
+Compare `docker ps` with the actual Java listener inside the container. Example:
+
+```text
+host 8989 -> container 8080
+```
 
 ### Another service still uses the old Kafka listener
 
