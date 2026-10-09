@@ -4,6 +4,8 @@ Practical troubleshooting and recovery runbooks built from real DevOps/SRE work 
 
 > Sensitive infrastructure details, internal IPs, credentials, certificate material, and organization-specific identifiers are intentionally replaced with placeholders.
 
+See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broader list of confirmed, documented, and still-in-progress cases.
+
 ## Kafka / KRaft
 
 - [Kafka KRaft: Add SCRAM-SHA-512 authentication](runbooks/kafka/kraft-scram-authentication.md)
@@ -14,17 +16,22 @@ Practical troubleshooting and recovery runbooks built from real DevOps/SRE work 
 - [Kafka + RKE2: JKS mTLS client identity and Secrets](runbooks/kafka/rke2-jks-mtls-client.md)
 - [Kafka + Docker: smoke-test a Java JKS mTLS client](runbooks/kafka/docker-jks-mtls-smoke-test.md)
 - [Spring Boot: Kafka SCRAM client configuration](runbooks/kafka/spring-boot-client-config.md)
+- [Kafka: separate KRaft quorum health from producer failures](runbooks/kafka/quorum-vs-producer-failure-triage.md)
 
 ## Kubernetes / RKE2
 
 - [CrashLoopBackOff caused by a missing log file or directory](runbooks/kubernetes/crashloopbackoff-missing-log-file.md)
 - [RKE2 control-plane degradation from resource or disk I/O pressure](runbooks/kubernetes/rke2-control-plane-resource-io-degradation.md)
 - [Registry secret, image tag, and ImagePullBackOff troubleshooting](runbooks/kubernetes/registry-secret-and-imagepull-troubleshooting.md)
+- [Redis Cluster MOVED errors behind Kubernetes Services](runbooks/kubernetes/redis-cluster-moved-service-exposure.md)
+- [Audit stale dependency endpoints across namespaces](runbooks/kubernetes/cross-namespace-config-audit.md)
 
 ## Observability
 
 - [OpenSearch: separate application and platform logs](runbooks/observability/opensearch-separate-application-platform-logs.md)
+- [OpenSearch: validate the real event timestamp field](runbooks/observability/opensearch-timestamp-field-validation.md)
 - [Prometheus + Alertmanager: validate Telegram alerts safely](runbooks/observability/prometheus-alertmanager-telegram-validation.md)
+- [Prometheus: align retention with the required history window](runbooks/observability/prometheus-retention-history-window.md)
 
 ## Java / Spring Boot
 
@@ -34,11 +41,14 @@ Practical troubleshooting and recovery runbooks built from real DevOps/SRE work 
 ## Redis
 
 - [Redis Cluster MOVED responses and proxy authentication](runbooks/redis/redis-cluster-moved-and-proxy-auth.md)
+- [Validate Predixy authentication in an isolated Redis Cluster lab](runbooks/redis/predixy-authentication-validation-lab.md)
 
 ## Databases
 
 - [Oracle object resolution and view inspection](runbooks/database/oracle-object-resolution-and-view-inspection.md)
+- [Oracle phone-number normalization for lookup troubleshooting](runbooks/database/oracle-phone-number-normalization.md)
 - [YugabyteDB YSQL Not Ready troubleshooting](runbooks/database/yugabytedb-ysql-not-ready.md)
+- [Verify Flyway migration history before debugging the application](runbooks/database/flyway-migration-history-verification.md)
 
 ## Docker / Containers
 
@@ -52,6 +62,7 @@ Practical troubleshooting and recovery runbooks built from real DevOps/SRE work 
 
 - [Recover a full root filesystem caused by Docker logs](runbooks/linux/docker-json-log-disk-full.md)
 - [Fix duplicate SSH host keys after cloning Linux VMs](runbooks/linux/cloned-vm-duplicate-ssh-host-keys.md)
+- [Discover nonstandard systemd services and runtime configuration](runbooks/linux/nonstandard-systemd-service-discovery.md)
 
 ## Templates
 
@@ -71,6 +82,7 @@ Practical troubleshooting and recovery runbooks built from real DevOps/SRE work 
 - Prefer application-specific Kafka identities instead of sharing administrative credentials.
 - Validate the runtime configuration actually loaded by the application, not only the source configuration you intended to deploy.
 - Distinguish transport reachability from application-level success; a reachable port is not proof that authentication or message delivery works.
+- Do not label an incident resolved until the fix has been verified at the application or service level.
 
 ## Example Kafka listener model
 
