@@ -89,7 +89,52 @@ Expected:
 - client certificate is issued by the Kafka CA
 - truststore contains the Kafka CA as a trusted certificate
 
-## 5. Create Kubernetes Secrets
+## 5. Expected application environment variables
+
+A Spring Boot deployment may expose the Kafka and database configuration through variables such as:
+
+```text
+DATABASE_URL
+DATABASE_USER
+DATABASE_PASSWORD
+KAFKA_URL
+KAFKA_SECURITY_PROTOCOL
+KAFKA_TRUSTSTORE_LOCATION
+KAFKA_TRUSTSTORE_PASSWORD
+KAFKA_KEYSTORE_LOCATION
+KAFKA_KEYSTORE_PASSWORD
+KAFKA_KEY_PASSWORD
+```
+
+Typical Kafka values:
+
+```text
+KAFKA_URL=broker-1.example:18443,broker-2.example:18443,broker-3.example:18443
+KAFKA_SECURITY_PROTOCOL=SSL
+KAFKA_TRUSTSTORE_LOCATION=file:/etc/kafka-certs/kafka.truststore.jks
+KAFKA_KEYSTORE_LOCATION=file:/etc/kafka-certs/kafka.keystore.jks
+```
+
+Confirm the application actually maps these variables into Kafka client properties.
+
+## 6. Optional Docker preflight before RKE2
+
+Before creating Kubernetes Secrets, the same JAR can be tested with the JKS files mounted read-only:
+
+```bash
+docker run --rm \
+  --name transaction-analysis-test \
+  --env-file env.list \
+  -v "$(pwd)/certs:/etc/kafka-certs:ro" \
+  -v "$(pwd)/app.jar:/app/app.jar:ro" \
+  -p 8989:8989 \
+  eclipse-temurin:17-jre \
+  java -jar /app/app.jar
+```
+
+Do not commit an `env.list` containing real credentials.
+
+## 7. Create Kubernetes Secrets
 
 ```bash
 kubectl create namespace taf
@@ -109,20 +154,11 @@ kubectl -n taf create secret generic transaction-analysis-env \
   --from-literal=DATABASE_PASSWORD='<secret>'
 ```
 
-## 6. Mount certs read-only and inject environment variables
+## 8. Mount certs read-only and inject environment variables
 
-Example environment values:
+Mount the Secret under `/etc/kafka-certs` with `readOnly: true` and inject non-secret values directly plus password values from the environment Secret.
 
-```text
-KAFKA_URL=broker-1.example:18443,broker-2.example:18443,broker-3.example:18443
-KAFKA_SECURITY_PROTOCOL=SSL
-KAFKA_KEYSTORE_LOCATION=file:/etc/kafka-certs/kafka.keystore.jks
-KAFKA_TRUSTSTORE_LOCATION=file:/etc/kafka-certs/kafka.truststore.jks
-```
-
-Mount the Secret under `/etc/kafka-certs` with `readOnly: true`.
-
-## 7. Important hostname-verification note
+## 9. Important hostname-verification note
 
 If the application connects using broker IP addresses, those IPs must be present in the broker certificate SANs when endpoint verification is enabled.
 
@@ -136,7 +172,7 @@ then the broker certificate must contain that DNS name in its SANs, or a network
 
 Do not disable endpoint verification merely to work around a SAN mismatch.
 
-## 8. Verify deployment
+## 10. Verify deployment
 
 ```bash
 kubectl -n taf rollout status deploy/transaction-analysis
@@ -144,7 +180,7 @@ kubectl -n taf logs deploy/transaction-analysis | grep -E 'Started|Kafka|SSL|ERR
 kubectl -n taf exec deploy/transaction-analysis -- ls -l /etc/kafka-certs
 ```
 
-## 9. Rotate the cert Secret
+## 11. Rotate the cert Secret
 
 ```bash
 kubectl -n taf create secret generic kafka-certs \
