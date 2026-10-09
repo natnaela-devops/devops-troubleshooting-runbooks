@@ -1,6 +1,6 @@
 # DevOps Troubleshooting Runbooks
 
-Practical troubleshooting and recovery runbooks built from real DevOps/SRE work across Linux, Kafka/KRaft, Kubernetes/RKE2, Java, Redis, databases, authentication, storage, observability, networking, and service operations.
+Practical troubleshooting and recovery runbooks built from real DevOps/SRE work across Linux, Kafka/KRaft, Kubernetes/RKE2, Java, Redis, databases, authentication, storage, observability, networking, automation, and service operations.
 
 > Sensitive infrastructure details, internal IPs, credentials, certificate material, and organization-specific identifiers are intentionally replaced with placeholders.
 
@@ -22,9 +22,11 @@ See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broade
 
 - [CrashLoopBackOff caused by a missing log file or directory](runbooks/kubernetes/crashloopbackoff-missing-log-file.md)
 - [RKE2 control-plane degradation from resource or disk I/O pressure](runbooks/kubernetes/rke2-control-plane-resource-io-degradation.md)
+- [RKE2 etcd member missing on one control-plane node](runbooks/kubernetes/rke2-etcd-member-missing-on-one-node.md)
 - [Registry secret, image tag, and ImagePullBackOff troubleshooting](runbooks/kubernetes/registry-secret-and-imagepull-troubleshooting.md)
 - [Redis Cluster MOVED errors behind Kubernetes Services](runbooks/kubernetes/redis-cluster-moved-service-exposure.md)
 - [Audit stale dependency endpoints across namespaces](runbooks/kubernetes/cross-namespace-config-audit.md)
+- [Longhorn PVCs stuck Terminating because of stale admission webhooks](runbooks/kubernetes/longhorn-stale-webhook-pvc-terminating.md)
 
 ## Observability
 
@@ -37,6 +39,11 @@ See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broade
 
 - [Java runtime version mismatch and unresolved Spring placeholders](runbooks/java/java-version-and-spring-placeholder-errors.md)
 - [Run a Java JAR with an environment file and nohup](runbooks/java/run-jar-with-env-file-and-nohup.md)
+- [Trace a Java payment rollback to a missing required request field](runbooks/java/payment-rollback-missing-required-field.md)
+
+## Identity / Keycloak
+
+- [Keycloak startup failure caused by installation-directory ownership](runbooks/keycloak/keycloak-data-directory-permission-startup.md)
 
 ## Redis
 
@@ -49,20 +56,30 @@ See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broade
 - [Oracle phone-number normalization for lookup troubleshooting](runbooks/database/oracle-phone-number-normalization.md)
 - [YugabyteDB YSQL Not Ready troubleshooting](runbooks/database/yugabytedb-ysql-not-ready.md)
 - [Verify Flyway migration history before debugging the application](runbooks/database/flyway-migration-history-verification.md)
+- [MySQL socket failure with Permission denied during startup](runbooks/database/mysql-socket-permission-denied-startup.md)
 
 ## Docker / Containers
 
 - [Patch a static frontend inside an existing container image](runbooks/docker/patch-static-frontend-inside-image.md)
+- [Harbor push HTTP 500 when object-storage endpoint is wrong](runbooks/docker/harbor-push-http500-object-storage-endpoint.md)
 
 ## Networking / VPN
 
 - [FortiVPN certificate, routing, and DNS troubleshooting](runbooks/networking/fortivpn-certificate-and-dns-troubleshooting.md)
+- [Repeated SMPP bind timeout: network reachability vs application retry](runbooks/networking/smpp-bind-timeout-network-triage.md)
 
 ## Linux
 
 - [Recover a full root filesystem caused by Docker logs](runbooks/linux/docker-json-log-disk-full.md)
 - [Fix duplicate SSH host keys after cloning Linux VMs](runbooks/linux/cloned-vm-duplicate-ssh-host-keys.md)
 - [Discover nonstandard systemd services and runtime configuration](runbooks/linux/nonstandard-systemd-service-discovery.md)
+- [Repair UEFI boot entries and GRUB without breaking Windows](runbooks/linux/uefi-grub-dual-boot-repair.md)
+- [Diagnose Linux boot slowness with systemd-analyze](runbooks/linux/systemd-analyze-boot-slowness.md)
+
+## Automation / Ansible
+
+- [Ansible YAML ScannerError caused by malformed inline comments](runbooks/automation/ansible-yaml-scanner-error.md)
+- [Legacy NodeSource repository causes npm/Node.js installation failures](runbooks/automation/legacy-nodesource-repository.md)
 
 ## Templates
 
@@ -73,16 +90,16 @@ See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broade
 
 - Inspect before changing.
 - Back up configuration before edits.
-- Separate broker/controller traffic from application client traffic.
-- Validate quorum health before and after Kafka changes.
-- Use rolling broker restarts when the change allows it.
+- Separate infrastructure health from application-level failure.
+- Validate quorum health before and after Kafka or etcd changes.
+- Use rolling restarts when the change allows it.
 - Test authentication with both positive and intentional negative cases.
 - Keep TLS hostname verification enabled and fix certificate SANs rather than disabling validation.
 - Never publish real secrets, private keys, keystores, certificates, internal IPs, cluster identifiers, or environment-specific checksums.
-- Prefer application-specific Kafka identities instead of sharing administrative credentials.
 - Validate the runtime configuration actually loaded by the application, not only the source configuration you intended to deploy.
 - Distinguish transport reachability from application-level success; a reachable port is not proof that authentication or message delivery works.
 - Do not label an incident resolved until the fix has been verified at the application or service level.
+- If the original evidence did not prove the final root cause, document the investigation honestly instead of inventing a resolution.
 
 ## Example Kafka listener model
 
@@ -102,4 +119,4 @@ Choose the model required by the application and security architecture rather th
 
 ## Expansion plan
 
-This repository is a sanitized record of real troubleshooting patterns encountered in day-to-day DevOps/SRE work. Additional cases will continue to be generalized only when enough evidence exists to document the diagnosis and recovery accurately without exposing private infrastructure details.
+This repository is a sanitized record of real troubleshooting patterns encountered in day-to-day DevOps/SRE work. Additional cases are generalized only when enough evidence exists to document the diagnosis and recovery accurately without exposing private infrastructure details.
