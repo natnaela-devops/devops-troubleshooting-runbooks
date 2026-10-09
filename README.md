@@ -1,6 +1,6 @@
 # DevOps Troubleshooting Runbooks
 
-Practical troubleshooting and recovery runbooks built from real DevOps/SRE work across Linux, Kafka/KRaft, Kubernetes/RKE2, Java, Redis, databases, authentication, storage, and service operations.
+Practical troubleshooting and recovery runbooks built from real DevOps/SRE work across Linux, Kafka/KRaft, Kubernetes/RKE2, Java, Redis, databases, authentication, storage, observability, networking, and service operations.
 
 > Sensitive infrastructure details, internal IPs, credentials, certificate material, and organization-specific identifiers are intentionally replaced with placeholders.
 
@@ -12,15 +12,24 @@ Practical troubleshooting and recovery runbooks built from real DevOps/SRE work 
 - [Kafka: mTLS client authentication with PKCS12](runbooks/kafka/mtls-client-authentication.md)
 - [Kafka + WildFly: migrate an existing producer to mTLS](runbooks/kafka/wildfly-mtls-client-migration.md)
 - [Kafka + RKE2: JKS mTLS client identity and Secrets](runbooks/kafka/rke2-jks-mtls-client.md)
+- [Kafka + Docker: smoke-test a Java JKS mTLS client](runbooks/kafka/docker-jks-mtls-smoke-test.md)
 - [Spring Boot: Kafka SCRAM client configuration](runbooks/kafka/spring-boot-client-config.md)
 
 ## Kubernetes / RKE2
 
 - [CrashLoopBackOff caused by a missing log file or directory](runbooks/kubernetes/crashloopbackoff-missing-log-file.md)
+- [RKE2 control-plane degradation from resource or disk I/O pressure](runbooks/kubernetes/rke2-control-plane-resource-io-degradation.md)
+- [Registry secret, image tag, and ImagePullBackOff troubleshooting](runbooks/kubernetes/registry-secret-and-imagepull-troubleshooting.md)
+
+## Observability
+
+- [OpenSearch: separate application and platform logs](runbooks/observability/opensearch-separate-application-platform-logs.md)
+- [Prometheus + Alertmanager: validate Telegram alerts safely](runbooks/observability/prometheus-alertmanager-telegram-validation.md)
 
 ## Java / Spring Boot
 
 - [Java runtime version mismatch and unresolved Spring placeholders](runbooks/java/java-version-and-spring-placeholder-errors.md)
+- [Run a Java JAR with an environment file and nohup](runbooks/java/run-jar-with-env-file-and-nohup.md)
 
 ## Redis
 
@@ -29,10 +38,20 @@ Practical troubleshooting and recovery runbooks built from real DevOps/SRE work 
 ## Databases
 
 - [Oracle object resolution and view inspection](runbooks/database/oracle-object-resolution-and-view-inspection.md)
+- [YugabyteDB YSQL Not Ready troubleshooting](runbooks/database/yugabytedb-ysql-not-ready.md)
+
+## Docker / Containers
+
+- [Patch a static frontend inside an existing container image](runbooks/docker/patch-static-frontend-inside-image.md)
+
+## Networking / VPN
+
+- [FortiVPN certificate, routing, and DNS troubleshooting](runbooks/networking/fortivpn-certificate-and-dns-troubleshooting.md)
 
 ## Linux
 
 - [Recover a full root filesystem caused by Docker logs](runbooks/linux/docker-json-log-disk-full.md)
+- [Fix duplicate SSH host keys after cloning Linux VMs](runbooks/linux/cloned-vm-duplicate-ssh-host-keys.md)
 
 ## Templates
 
@@ -51,6 +70,7 @@ Practical troubleshooting and recovery runbooks built from real DevOps/SRE work 
 - Never publish real secrets, private keys, keystores, certificates, internal IPs, cluster identifiers, or environment-specific checksums.
 - Prefer application-specific Kafka identities instead of sharing administrative credentials.
 - Validate the runtime configuration actually loaded by the application, not only the source configuration you intended to deploy.
+- Distinguish transport reachability from application-level success; a reachable port is not proof that authentication or message delivery works.
 
 ## Example Kafka listener model
 
@@ -70,4 +90,4 @@ Choose the model required by the application and security architecture rather th
 
 ## Expansion plan
 
-This repository is intentionally growing into a sanitized record of real troubleshooting patterns encountered in day-to-day DevOps/SRE work. Additional runbooks will be added for RKE2 networking, VPN/DNS troubleshooting, observability, database connectivity, container image debugging, service startup failures, and production migration procedures as those cases are validated and generalized safely.
+This repository is a sanitized record of real troubleshooting patterns encountered in day-to-day DevOps/SRE work. Additional cases will continue to be generalized only when enough evidence exists to document the diagnosis and recovery accurately without exposing private infrastructure details.
