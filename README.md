@@ -14,7 +14,7 @@ See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broade
 - [Kafka: mTLS client authentication with PKCS12](runbooks/kafka/mtls-client-authentication.md)
 - [Kafka + WildFly: migrate an existing producer to mTLS](runbooks/kafka/wildfly-mtls-client-migration.md)
 - [Kafka + RKE2: JKS mTLS client identity and Secrets](runbooks/kafka/rke2-jks-mtls-client.md)
-- [Kafka + Docker: smoke-test a Java JKS mTLS client](runbooks/kafka/docker-jks-mtls-smoke-test.md)
+- [Kafka + Docker: build and smoke-test a Java JKS mTLS client](runbooks/kafka/docker-jks-mtls-smoke-test.md)
 - [Spring Boot: Kafka SCRAM client configuration](runbooks/kafka/spring-boot-client-config.md)
 - [Kafka: separate KRaft quorum health from producer failures](runbooks/kafka/quorum-vs-producer-failure-triage.md)
 
@@ -60,6 +60,7 @@ See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broade
 
 ## Docker / Containers
 
+- [Build a Java 17 application image on an offline Docker host](runbooks/docker/offline-java17-image-build.md)
 - [Patch a static frontend inside an existing container image](runbooks/docker/patch-static-frontend-inside-image.md)
 - [Harbor push HTTP 500 when object-storage endpoint is wrong](runbooks/docker/harbor-push-http500-object-storage-endpoint.md)
 
