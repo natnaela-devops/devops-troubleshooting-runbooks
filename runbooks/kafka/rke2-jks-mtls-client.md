@@ -111,11 +111,13 @@ Typical Kafka values:
 ```text
 KAFKA_URL=broker-1.example:18443,broker-2.example:18443,broker-3.example:18443
 KAFKA_SECURITY_PROTOCOL=SSL
-KAFKA_TRUSTSTORE_LOCATION=file:/etc/kafka-certs/kafka.truststore.jks
-KAFKA_KEYSTORE_LOCATION=file:/etc/kafka-certs/kafka.keystore.jks
+KAFKA_TRUSTSTORE_LOCATION=/etc/kafka-certs/kafka.truststore.jks
+KAFKA_KEYSTORE_LOCATION=/etc/kafka-certs/kafka.keystore.jks
 ```
 
 Confirm the application actually maps these variables into Kafka client properties.
+
+Do not assume `file:/` and plain absolute paths are interchangeable. Some Spring `Resource` properties expect `file:/path`, while direct Kafka SSL properties may treat `file:/path` as a literal filename. Use the path syntax proven by the application's own configuration and runtime logs.
 
 ## 6. Optional Docker preflight before RKE2
 
@@ -154,6 +156,8 @@ kubectl -n taf create secret generic transaction-analysis-env \
   --from-literal=DATABASE_PASSWORD='<secret>'
 ```
 
+When Rancher UI is used instead of `kubectl`, binary JKS files can be accidentally double-Base64 encoded. Use the first-layer Base64 values directly under Secret YAML `data:` and verify the mounted file hashes. See [Rancher/Kubernetes Binary Secret Double-Base64 Troubleshooting](../kubernetes/rancher-binary-secret-double-base64.md).
+
 ## 8. Mount certs read-only and inject environment variables
 
 Mount the Secret under `/etc/kafka-certs` with `readOnly: true` and inject non-secret values directly plus password values from the environment Secret.
@@ -180,6 +184,15 @@ kubectl -n taf logs deploy/transaction-analysis | grep -E 'Started|Kafka|SSL|ERR
 kubectl -n taf exec deploy/transaction-analysis -- ls -l /etc/kafka-certs
 ```
 
+Verify binary integrity inside the pod:
+
+```bash
+kubectl -n taf exec deploy/transaction-analysis -- \
+  sha256sum /etc/kafka-certs/kafka.keystore.jks /etc/kafka-certs/kafka.truststore.jks
+```
+
+The hashes must match the source JKS files used to build the Secret.
+
 ## 11. Rotate the cert Secret
 
 ```bash
@@ -200,6 +213,10 @@ The environment Secret is missing or does not contain the expected key.
 ### `FileNotFoundException` for `/etc/kafka-certs/...`
 
 The Secret mount is missing, path is wrong, or the key names differ from the filenames expected by the application.
+
+### Mounted JKS begins with readable `/u3+7Q...`
+
+The JKS is still Base64 text instead of the original binary. Fix the Secret encoding and compare SHA-256 hashes with the source JKS files.
 
 ### SSL handshake failure
 
