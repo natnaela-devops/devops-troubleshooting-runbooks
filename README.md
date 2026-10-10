@@ -14,6 +14,7 @@ See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broade
 - [Kafka: mTLS client authentication with PKCS12](runbooks/kafka/mtls-client-authentication.md)
 - [Kafka + WildFly: migrate an existing producer to mTLS](runbooks/kafka/wildfly-mtls-client-migration.md)
 - [Kafka + RKE2: JKS mTLS client identity and Secrets](runbooks/kafka/rke2-jks-mtls-client.md)
+- [Kafka + RKE2: PKCS12 mTLS client identity and Secrets](runbooks/kafka/rke2-pkcs12-mtls-client.md)
 - [Kafka + Docker: build and smoke-test a Java JKS mTLS client](runbooks/kafka/docker-jks-mtls-smoke-test.md)
 - [Spring Boot: Kafka SCRAM client configuration](runbooks/kafka/spring-boot-client-config.md)
 - [Kafka: separate KRaft quorum health from producer failures](runbooks/kafka/quorum-vs-producer-failure-triage.md)
@@ -27,6 +28,7 @@ See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broade
 - [Redis Cluster MOVED errors behind Kubernetes Services](runbooks/kubernetes/redis-cluster-moved-service-exposure.md)
 - [Audit stale dependency endpoints across namespaces](runbooks/kubernetes/cross-namespace-config-audit.md)
 - [Longhorn PVCs stuck Terminating because of stale admission webhooks](runbooks/kubernetes/longhorn-stale-webhook-pvc-terminating.md)
+- [Rancher/Kubernetes binary Secret double-Base64 troubleshooting](runbooks/kubernetes/rancher-binary-secret-double-base64.md)
 
 ## Observability
 
