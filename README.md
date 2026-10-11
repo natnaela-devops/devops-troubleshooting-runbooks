@@ -10,6 +10,7 @@ See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broade
 
 - [Kafka KRaft: Add SCRAM-SHA-512 authentication](runbooks/kafka/kraft-scram-authentication.md)
 - [Kafka KRaft: Change listener and controller ports safely](runbooks/kafka/kraft-port-migration.md)
+- [Kafka KRaft: rolling mTLS listener rollout](runbooks/kafka/kraft-rolling-mtls-listener-rollout.md)
 - [Kafka: Validate SCRAM authentication end to end](runbooks/kafka/scram-validation.md)
 - [Kafka: mTLS client authentication with PKCS12](runbooks/kafka/mtls-client-authentication.md)
 - [Kafka + WildFly: migrate an existing producer to mTLS](runbooks/kafka/wildfly-mtls-client-migration.md)
