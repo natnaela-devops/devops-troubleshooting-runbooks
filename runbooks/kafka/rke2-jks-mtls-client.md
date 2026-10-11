@@ -174,7 +174,13 @@ kafka.kafka.svc
 
 then the broker certificate must contain that DNS name in its SANs, or a network endpoint with a matching certificate must be used.
 
-Do not disable endpoint verification merely to work around a SAN mismatch.
+Do not disable endpoint verification merely to work around a SAN mismatch. In production, prefer:
+
+```properties
+spring.kafka.properties.ssl.endpoint.identification.algorithm=https
+```
+
+and confirm runtime `ConsumerConfig`/`ProducerConfig` shows `ssl.endpoint.identification.algorithm = https`.
 
 ## 10. Verify deployment
 
@@ -193,7 +199,69 @@ kubectl -n taf exec deploy/transaction-analysis -- \
 
 The hashes must match the source JKS files used to build the Secret.
 
-## 11. Rotate the cert Secret
+Then verify runtime Kafka evidence rather than only pod readiness. Strong success signals include:
+
+```text
+security.protocol = SSL
+ssl.keystore.type = JKS
+ssl.truststore.type = JKS
+Cluster ID: <expected-cluster-id>
+Successfully joined group
+partitions assigned
+```
+
+If consumers resolve partition leaders on multiple brokers, that is stronger evidence than bootstrap reachability alone.
+
+## 11. Recover from an unknown or mismatched JKS password
+
+If the mounted file hashes match the source files but `keytool` rejects the password both inside the pod and against the original source files, the problem is the JKS password itself, not Kubernetes.
+
+Confirm the files are really JKS:
+
+```bash
+od -An -tx1 -N4 kafka.keystore.jks
+od -An -tx1 -N4 kafka.truststore.jks
+```
+
+JKS starts with:
+
+```text
+fe ed fe ed
+```
+
+If the original client private key and signed certificate still exist, do not reissue the certificate merely because the JKS password is unknown. First confirm the key and certificate match:
+
+```bash
+openssl x509 -noout -modulus -in client.crt | openssl sha256
+openssl rsa -noout -modulus -in client.key | openssl sha256
+```
+
+If the hashes match, rebuild fresh container files with a new known password:
+
+```bash
+openssl pkcs12 -export \
+  -inkey client.key \
+  -in client.crt \
+  -certfile ca.crt \
+  -name application-client \
+  -out client.p12
+
+keytool -importkeystore \
+  -srckeystore client.p12 \
+  -srcstoretype PKCS12 \
+  -destkeystore kafka.keystore.jks \
+  -deststoretype JKS
+
+keytool -importcert -noprompt \
+  -alias kafka-ca \
+  -file ca.crt \
+  -keystore kafka.truststore.jks \
+  -storetype JKS
+```
+
+Verify the rebuilt keystore contains a `PrivateKeyEntry`, the truststore contains the CA as a `trustedCertEntry`, and both open successfully with the new password before updating Kubernetes Secrets.
+
+## 12. Rotate the cert Secret
 
 ```bash
 kubectl -n taf create secret generic kafka-certs \
@@ -217,6 +285,10 @@ The Secret mount is missing, path is wrong, or the key names differ from the fil
 ### Mounted JKS begins with readable `/u3+7Q...`
 
 The JKS is still Base64 text instead of the original binary. Fix the Secret encoding and compare SHA-256 hashes with the source JKS files.
+
+### `Keystore was tampered with, or password was incorrect`
+
+Test the password interactively against both the mounted JKS and the source JKS. If identical hashes fail with the same password at both locations, stop troubleshooting Kubernetes and either recover the actual password or rebuild the JKS from the still-valid client key/certificate/CA material.
 
 ### SSL handshake failure
 
