@@ -104,6 +104,7 @@ Important checks:
 
 - Do not define `kafka.security.protocol` twice.
 - Remove any legacy `PLAINTEXT` value when testing mTLS.
+- In ordinary Java `.properties` loading, a later duplicate key can override the earlier value. A file containing both `SSL` and then `PLAINTEXT` can therefore make the effective protocol `PLAINTEXT` even though the intended SSL line is present.
 - Do not append shell-style trailing `\` characters to Java `.properties` lines.
 - Keep hostname verification enabled when broker certificates have correct SANs.
 
@@ -112,6 +113,8 @@ Important checks:
 Prefer redeploying the affected deployment rather than restarting every application on the server.
 
 Use the environment's normal deployment process. Do not manually edit files under WildFly's `standalone/tmp/vfs` or `standalone/data/content` directories.
+
+Replacing a PKCS12 file on disk is not enough if the Kafka producer has already initialized. Redeploy or restart the affected application so the Kafka client rebuilds its SSL context and reloads the certificate stores.
 
 ## 7. Verify the application loaded the new settings
 
@@ -135,7 +138,42 @@ A successful metadata connection normally also shows a Kafka cluster ID:
 [Producer clientId=<client-id>] Cluster ID: <cluster-id>
 ```
 
-## 8. Complete end-to-end validation
+## 8. Prove TLS independently of the WAR
+
+If the broker reports `SSL handshake failed`, test the exact client identity independently of WildFly.
+
+Extract temporary PEM material from the PKCS12 stores:
+
+```bash
+mkdir -m 700 /tmp/kafka-mtls-test
+openssl pkcs12 -in /etc/ssl/kafka/service-client.p12 -clcerts -nokeys -out /tmp/kafka-mtls-test/client.crt
+openssl pkcs12 -in /etc/ssl/kafka/service-client.p12 -nocerts -nodes -out /tmp/kafka-mtls-test/client.key
+chmod 600 /tmp/kafka-mtls-test/client.key
+openssl pkcs12 -in /etc/ssl/kafka/service-client-truststore.p12 -nokeys -out /tmp/kafka-mtls-test/ca.crt
+```
+
+Then test the broker:
+
+```bash
+openssl s_client \
+  -connect <broker>:<ssl-port> \
+  -cert /tmp/kafka-mtls-test/client.crt \
+  -key /tmp/kafka-mtls-test/client.key \
+  -CAfile /tmp/kafka-mtls-test/ca.crt \
+  -verify_return_error \
+  -verify_ip <broker-ip> \
+  -brief
+```
+
+If this returns `Verification: OK` but the Java producer still fails, the broker certificate, client identity, and trust relationship are already proven. Inspect the application's effective runtime settings before changing Kafka again.
+
+Always remove temporary extracted private-key material after testing:
+
+```bash
+rm -rf /tmp/kafka-mtls-test
+```
+
+## 9. Complete end-to-end validation
 
 Trigger the application's real Kafka publish path and monitor:
 
@@ -145,6 +183,8 @@ tail -F /opt/wildfly/standalone/log/server.log | \
 ```
 
 The strongest application-level success signal is a line showing a successful send with topic, partition, and offset.
+
+When correlating application and broker logs, confirm whether both hosts use the same timezone. A fixed offset can make pre-redeploy broker failures appear newer than the successful application startup if timestamps are compared without normalization.
 
 ## Common failures
 
@@ -165,6 +205,23 @@ The truststore does not trust the broker certificate chain.
 
 The broker rejected the client certificate or no usable client certificate was presented.
 
+### Direct OpenSSL succeeds but the WAR still fails
+
+Inspect the Kafka producer's effective configuration. In particular, search for duplicate `kafka.security.protocol` values and verify the deployed producer actually logs `security.protocol = SSL`.
+
+### PKCS12 password is unknown but the original key and certificate still exist
+
+Do not brute-force the store. Verify that the private key matches the certificate:
+
+```bash
+openssl x509 -noout -modulus -in client.crt | openssl sha256
+openssl rsa  -noout -modulus -in client.key | openssl sha256
+```
+
+If the hashes match, rebuild only the PKCS12 container with a new known password. Reissuing the certificate is unnecessary.
+
+After rebuilding, compare checksums before copying to the application host. Be careful not to copy the old file when the new file has a similar `.new.p12` name.
+
 ### Hostname verification failure
 
 Fix the broker certificate SAN. Do not disable hostname verification as the default workaround.
@@ -180,7 +237,9 @@ Confirm the deployed WAR actually contains or loads the new configuration. Do no
 - keystore contains `PrivateKeyEntry`
 - truststore contains Kafka CA
 - all brokers reachable on SSL listener
+- direct mTLS handshake succeeds with endpoint verification
 - runtime producer shows `security.protocol = SSL`
 - runtime producer shows correct keystore/truststore paths
 - runtime producer connects to expected Kafka cluster
+- no new broker-side TLS authentication failures after the successful redeploy boundary
 - real application publish succeeds
