@@ -170,6 +170,18 @@ Keep the keystore, truststore, and key passwords in a separate Secret.
 
 Do not assume every Spring Boot application treats resource paths identically. Some configurations expect `file:/path`, while direct Kafka client properties may require a plain absolute filesystem path. Preserve the syntax proven by the application's own configuration and runtime behavior.
 
+Do not assume password variable names are generic. Applications may prefix every Kafka setting with a service-specific namespace such as `APP_A_KAFKA_*` or `APP_B_KAFKA_*`. Before testing a mounted store, inspect the running process environment and use the exact variable names that the application receives.
+
+Safe presence check without printing secret values:
+
+```bash
+for v in APP_KAFKA_KEYSTORE_PASSWORD APP_KAFKA_KEY_PASSWORD APP_KAFKA_TRUSTSTORE_PASSWORD; do
+  if [ -n "$(printenv "$v")" ]; then echo "$v=SET"; else echo "$v=MISSING"; fi
+done
+```
+
+If the application uses a different prefix, substitute the real names. Passing an unset variable to `keytool -storepass "$VARIABLE"` tests an empty password and can create a false diagnosis that the PKCS12 file is broken.
+
 ## Verify the mounted binaries
 
 Inside the pod:
@@ -180,6 +192,27 @@ sha256sum /etc/kafka-certs/client-keystore.p12 /etc/kafka-certs/truststore.p12
 ```
 
 Compare the hashes with the source files used to create the Secret. Exact matches prove that the binary Secret survived transfer and mounting without corruption or double encoding.
+
+Then validate the runtime passwords with the exact service-specific variables:
+
+```bash
+keytool -list -storetype PKCS12 \
+  -keystore /etc/kafka-certs/client-keystore.p12 \
+  -storepass "$APP_KAFKA_KEYSTORE_PASSWORD" >/dev/null \
+  && echo 'KEYSTORE OK' || echo 'KEYSTORE FAILED'
+
+keytool -list -storetype PKCS12 \
+  -keystore /etc/kafka-certs/truststore.p12 \
+  -storepass "$APP_KAFKA_TRUSTSTORE_PASSWORD" >/dev/null \
+  && echo 'TRUSTSTORE OK' || echo 'TRUSTSTORE FAILED'
+```
+
+If the variable names are unknown or the application is crash-looping, test the store interactively before rebuilding anything:
+
+```bash
+keytool -list -storetype PKCS12 -keystore /etc/kafka-certs/client-keystore.p12
+keytool -list -storetype PKCS12 -keystore /etc/kafka-certs/truststore.p12
+```
 
 ## Verify end-to-end behavior
 
