@@ -4,6 +4,19 @@ This case study documents a sanitized version of hands-on infrastructure work pe
 
 > Customer names, internal IPs, credentials, certificates, domains, cluster identifiers, and environment-specific secrets are intentionally excluded. The architecture below is generalized from real work rather than copied from a customer environment.
 
+## Start here
+
+For a quick recruiter or engineering review, use this order:
+
+1. [Architecture](architecture.md)
+2. [UAT to production workflow](uat-to-production.md)
+3. [Networking, Nginx, and TLS](networking-nginx.md)
+4. [Identity and Keycloak](identity-keycloak.md)
+5. [Messaging and cache: Kafka + Redis/Predixy](messaging-cache.md)
+6. [Databases and storage](databases-storage.md)
+7. [Observability and alerting](observability.md)
+8. [Operations, troubleshooting, and recovery](operations-recovery.md)
+
 ## Scope of work
 
 The environment included a mix of Kubernetes-hosted and VM-hosted services spanning application delivery, identity, messaging, caching, storage, databases, observability, artifact management, and edge routing.
