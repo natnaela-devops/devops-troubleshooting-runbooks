@@ -6,6 +6,13 @@ Practical troubleshooting and recovery runbooks built from real DevOps/SRE work 
 
 See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broader list of confirmed, documented, and still-in-progress cases.
 
+## Production case study
+
+- [Banking Digital Platform Infrastructure — sanitized UAT and production case study](projects/banking-digital-platform-infrastructure/README.md)
+- [Layered architecture notes](projects/banking-digital-platform-infrastructure/architecture.md)
+
+This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn, Harbor, Kafka/KRaft, Redis Cluster + Predixy, YugabyteDB, TimescaleDB, Keycloak, Nginx, SeaweedFS, PM2, OpenSearch, Prometheus/Alertmanager, and related application integrations. It documents the engineering scope and operational methods without publishing customer-specific infrastructure.
+
 ## Kafka / KRaft
 
 - [Kafka KRaft: Add SCRAM-SHA-512 authentication](runbooks/kafka/kraft-scram-authentication.md)
