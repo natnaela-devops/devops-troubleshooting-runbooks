@@ -11,6 +11,8 @@ See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broade
 - [Kafka KRaft: Add SCRAM-SHA-512 authentication](runbooks/kafka/kraft-scram-authentication.md)
 - [Kafka KRaft: Change listener and controller ports safely](runbooks/kafka/kraft-port-migration.md)
 - [Kafka KRaft: rolling mTLS listener rollout](runbooks/kafka/kraft-rolling-mtls-listener-rollout.md)
+- [Kafka: end-to-end mTLS migration architecture](runbooks/kafka/kafka-mtls-migration-architecture.md)
+- [Kafka: retire legacy listeners after mTLS migration](runbooks/kafka/legacy-listener-retirement.md)
 - [Kafka: Validate SCRAM authentication end to end](runbooks/kafka/scram-validation.md)
 - [Kafka: mTLS client authentication with PKCS12](runbooks/kafka/mtls-client-authentication.md)
 - [Kafka + WildFly: migrate an existing producer to mTLS](runbooks/kafka/wildfly-mtls-client-migration.md)
@@ -50,6 +52,7 @@ See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broade
 
 ## Redis
 
+- [Redis Cluster + Predixy architecture and readiness model](runbooks/redis/redis-cluster-predixy-architecture.md)
 - [Redis Cluster MOVED responses and proxy authentication](runbooks/redis/redis-cluster-moved-and-proxy-auth.md)
 - [Validate Predixy authentication in an isolated Redis Cluster lab](runbooks/redis/predixy-authentication-validation-lab.md)
 
