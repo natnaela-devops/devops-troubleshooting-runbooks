@@ -32,7 +32,9 @@ This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn,
 ## Kubernetes / RKE2
 
 - [CrashLoopBackOff caused by a missing log file or directory](runbooks/kubernetes/crashloopbackoff-missing-log-file.md)
-- [RKE2 control-plane degradation from resource or disk I/O pressure](runbooks/kubernetes/rke2-control-plane-resource-io-degradation.md)
+- [RKE2 control-plane degradation from disk I/O pressure](runbooks/kubernetes/rke2-control-plane-resource-io-degradation.md)
+- [RKE2 + Longhorn storage design guide](runbooks/kubernetes/rke2-longhorn-storage-design.md)
+- [RKE2 production features and hardening guide](runbooks/kubernetes/rke2-production-features-and-hardening.md)
 - [RKE2 etcd member missing on one control-plane node](runbooks/kubernetes/rke2-etcd-member-missing-on-one-node.md)
 - [Registry secret, image tag, and ImagePullBackOff troubleshooting](runbooks/kubernetes/registry-secret-and-imagepull-troubleshooting.md)
 - [Redis Cluster MOVED errors behind Kubernetes Services](runbooks/kubernetes/redis-cluster-moved-service-exposure.md)
