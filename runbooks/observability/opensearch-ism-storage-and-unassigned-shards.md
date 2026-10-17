@@ -31,7 +31,7 @@ curl -sS -k -u '<user>:<password>' https://localhost:9200/_cluster/allocation/ex
 
 A lifecycle policy was introduced so indices rolled over and eventually expired instead of growing forever.
 
-Sanitized example:
+Illustrative policy only: rollover requires a configured write alias, rollover-alias setting, and initial write index. Verify those prerequisites before applying this example.
 
 ```json
 {
@@ -57,7 +57,7 @@ Sanitized example:
 }
 ```
 
-Retention, rollover age, and shard-size thresholds must be sized from actual ingest rate and storage capacity.
+Retention and rollover thresholds depend on actual ingest and available storage. Confirm the policy is attached using ISM explain and test that both rollover and deletion execute as intended.
 
 ### Standardize index templates
 
