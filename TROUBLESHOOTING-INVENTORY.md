@@ -4,6 +4,22 @@ This file tracks troubleshooting patterns that were actually encountered or inve
 
 Sensitive organization names, internal addresses, credentials, certificate material, and environment-specific identifiers are excluded.
 
+## Recently documented cases
+
+These runbooks were added after the original inventory and are linked here so the index reflects what is actually published.
+
+| Incident or investigation | Runbook |
+| --- | --- |
+| Keycloak reverse-proxy HTTPS redirects | [Keycloak behind Nginx](runbooks/keycloak/keycloak-nginx-reverse-proxy-redirect-loop.md) |
+| Keycloak startup and systemd service management | [Keycloak systemd](runbooks/keycloak/keycloak-systemd-service.md) |
+| Nginx upstream response-header size and SELinux upstream denials | [Nginx 502/504 triage](runbooks/networking/nginx-502-504-selinux-upstream-triage.md) |
+| Kafka consumer lag and rebalance under slow database processing | [Consumer lag](runbooks/kafka/consumer-lag-rebalancing-under-slow-processing.md) |
+| Oracle-to-Redis sync connection exhaustion | [Sync worker backpressure](runbooks/automation/oracle-redis-sync-backpressure.md) |
+| OpenSearch disk pressure and ISM lifecycle | [OpenSearch storage](runbooks/observability/opensearch-ism-storage-and-unassigned-shards.md) |
+| OpenTelemetry application/platform log normalization | [Structured logs](runbooks/observability/opentelemetry-structured-log-standardization.md) |
+| Kubernetes ConfigMap/Secret reference mismatch | [Environment mismatch](runbooks/kubernetes/configmap-secret-env-mismatch-crashloopbackoff.md) |
+| k3d Harbor image pulls blocked by untrusted certificate | [Harbor registry trust](runbooks/kubernetes/argocd-k3d-harbor-self-signed-registry.md) |
+
 ## Kubernetes / RKE2
 
 | Case | State | Runbook |
