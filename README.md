@@ -28,10 +28,13 @@ This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn,
 - [Kafka + Docker: build and smoke-test a Java JKS mTLS client](runbooks/kafka/docker-jks-mtls-smoke-test.md)
 - [Spring Boot: Kafka SCRAM client configuration](runbooks/kafka/spring-boot-client-config.md)
 - [Kafka: separate KRaft quorum health from producer failures](runbooks/kafka/quorum-vs-producer-failure-triage.md)
+- [Kafka consumer lag and repeated rebalancing under slow processing](runbooks/kafka/consumer-lag-rebalancing-under-slow-processing.md)
 
 ## Kubernetes / RKE2
 
 - [CrashLoopBackOff caused by a missing log file or directory](runbooks/kubernetes/crashloopbackoff-missing-log-file.md)
+- [CrashLoopBackOff from ConfigMap and Secret environment mismatches](runbooks/kubernetes/configmap-secret-env-mismatch-crashloopbackoff.md)
+- [Argo CD / k3d deployment failures with a self-signed Harbor registry](runbooks/kubernetes/argocd-k3d-harbor-self-signed-registry.md)
 - [RKE2 control-plane degradation from disk I/O pressure](runbooks/kubernetes/rke2-control-plane-resource-io-degradation.md)
 - [RKE2 + Longhorn storage design guide](runbooks/kubernetes/rke2-longhorn-storage-design.md)
 - [RKE2 production features and hardening guide](runbooks/kubernetes/rke2-production-features-and-hardening.md)
@@ -46,6 +49,8 @@ This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn,
 
 - [OpenSearch: separate application and platform logs](runbooks/observability/opensearch-separate-application-platform-logs.md)
 - [OpenSearch: validate the real event timestamp field](runbooks/observability/opensearch-timestamp-field-validation.md)
+- [OpenSearch storage exhaustion, ISM lifecycle, and unassigned shards](runbooks/observability/opensearch-ism-storage-and-unassigned-shards.md)
+- [Standardize Kubernetes application logs for OpenSearch with OpenTelemetry](runbooks/observability/opentelemetry-structured-log-standardization.md)
 - [Prometheus + Alertmanager: validate Telegram alerts safely](runbooks/observability/prometheus-alertmanager-telegram-validation.md)
 - [Prometheus: align retention with the required history window](runbooks/observability/prometheus-retention-history-window.md)
 
@@ -59,6 +64,7 @@ This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn,
 
 - [Keycloak startup failure caused by installation-directory ownership](runbooks/keycloak/keycloak-data-directory-permission-startup.md)
 - [Keycloak behind Nginx: redirect loops, wrong scheme, and proxy-header failures](runbooks/keycloak/keycloak-nginx-reverse-proxy-redirect-loop.md)
+- [Run Keycloak reliably with systemd](runbooks/keycloak/keycloak-systemd-service.md)
 
 ## Redis
 
@@ -94,8 +100,9 @@ This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn,
 - [Repair UEFI boot entries and GRUB without breaking Windows](runbooks/linux/uefi-grub-dual-boot-repair.md)
 - [Diagnose Linux boot slowness with systemd-analyze](runbooks/linux/systemd-analyze-boot-slowness.md)
 
-## Automation / Ansible
+## Automation / Data pipelines / Ansible
 
+- [Oracle-to-Redis sync worker backpressure and connection exhaustion](runbooks/automation/oracle-redis-sync-backpressure.md)
 - [Ansible YAML ScannerError caused by malformed inline comments](runbooks/automation/ansible-yaml-scanner-error.md)
 - [Legacy NodeSource repository causes npm/Node.js installation failures](runbooks/automation/legacy-nodesource-repository.md)
 
