@@ -1,8 +1,8 @@
 # RKE2 Control-Plane Degradation from Disk I/O Pressure
 
-This runbook documents a real failure pattern where an RKE2/Rancher cluster became unstable because severe storage latency affected the host filesystem, Longhorn, containerd, kubelet, and embedded etcd at the same time.
+During an RKE2/Rancher outage, I found block-device I/O errors and EXT4 write failures while investigating control-plane and container-runtime failures. I also checked Longhorn volumes and node storage state. Those observations supported a host-storage failure mechanism; they did **not** prove that Longhorn caused it or identify the underlying datastore/hypervisor trigger.
 
-The goal is to distinguish a storage-driven control-plane failure from an etcd-only problem before taking destructive recovery actions.
+This is the investigation sequence I used, expanded into a reusable runbook. Some checks below are follow-up diagnostics, not claims that every command was executed during that incident.
 
 ## Symptoms
 
@@ -101,12 +101,7 @@ kubectl get --raw='/readyz?verbose'
 
 If `kubectl` tries `http://localhost:8080`, that usually means no kubeconfig was loaded; it is not by itself proof that the cluster API is down.
 
-For persistent shell configuration:
-
-```bash
-echo 'export KUBECONFIG=/etc/rancher/rke2/rke2.yaml' > /etc/profile.d/rke2-kubeconfig.sh
-chmod 644 /etc/profile.d/rke2-kubeconfig.sh
-```
+For repeated administration, configure `KUBECONFIG` only for authorized operators. The RKE2 admin kubeconfig is highly privileged: do not copy it into world-readable locations or expose it to all shell users.
 
 ## 6. Check Longhorn health and capacity
 
@@ -165,9 +160,9 @@ Recovery should include:
 
 ## Root-cause wording
 
-If the evidence proves that storage latency caused control-plane degradation but does not prove what caused the storage backend to slow down, document the result precisely:
+For this incident, the kernel I/O and filesystem write errors were direct observations. Their precise relationship to individual service failures still requires correlated timestamps and service logs. Record the conclusion within that evidence boundary:
 
-> Confirmed failure mechanism: severe host/block-storage I/O latency caused RKE2, etcd, container runtime, filesystem, and Longhorn instability.
+> Observed: host block I/O and EXT4 write errors coincided with RKE2/API and container-runtime disruption; Longhorn volumes also required health checks.
 >
 > Upstream trigger: not yet proven. Hypervisor/datastore saturation, backend storage faults, or workload-driven contention require separate infrastructure investigation.
 
