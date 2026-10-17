@@ -37,7 +37,7 @@ with pool.acquire() as conn:
     pass
 ```
 
-Pool sizing must match actual database capacity and workload; the numbers above are illustrative.
+The example uses the cx_Oracle driver from the original implementation. For modern python-oracledb installations, check the installed driver's pool API instead of copying this snippet unchanged. Pool sizes are illustrative.
 
 ### Reuse Redis connections
 
@@ -60,6 +60,8 @@ for key, value in batch:
     pipe.set(key, value)
 pipe.execute()
 ```
+
+When Redis Cluster is involved, use a cluster-aware client or validate that the proxy handles pipeline routing correctly. Do not assume a single-node pipeline applies unchanged across hash slots.
 
 ### Back off on transient failures
 
