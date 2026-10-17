@@ -1,12 +1,13 @@
 # Nginx 502/504 upstream failures and SELinux connection denials
 
-This runbook separates four failure classes that are often grouped together under a generic "Nginx is down" report: unreachable upstreams, upstream timeouts, application failures, and SELinux policy denials.
+This runbook separates four failure classes that are often grouped together under a generic "Nginx is down" report: unreachable upstreams, upstream timeouts, application failures, oversized upstream headers, and SELinux policy denials.
 
 ## Typical symptoms
 
 - `502 Bad Gateway`
 - `504 Gateway Timeout`
 - Nginx error log contains `connect() failed (13: Permission denied)`
+- Nginx error log contains `upstream sent too big header while reading response header from upstream`
 - Backend service works with local `curl`, but Nginx cannot proxy to it
 - Backend accepts connections but responses stall or time out
 
@@ -17,7 +18,7 @@ sudo tail -n 100 /var/log/nginx/error.log
 sudo journalctl -u nginx -n 100 --no-pager
 ```
 
-Do not immediately increase buffers or timeouts. A 502 can be caused by connection refusal, process crashes, TLS mismatch, permission denial, DNS failure, or malformed upstream responses. A 504 usually points more directly to an upstream that did not respond in time.
+Do not immediately increase buffers or timeouts. A 502 can be caused by connection refusal, process crashes, TLS mismatch, permission denial, DNS failure, malformed upstream responses, or an oversized response header. A 504 usually points more directly to an upstream that did not respond in time.
 
 ## 2. Verify the upstream process and socket
 
@@ -62,7 +63,7 @@ Enable it only when justified by the deployment model:
 sudo setsebool -P httpd_can_network_connect 1
 ```
 
-Do not disable SELinux globally to make the proxy work. Use audit evidence to correct the specific policy requirement.
+This was the corrective action in the validated SELinux incident. SELinux remained enforcing; it was not disabled globally.
 
 ## 4. Validate the Nginx upstream definition
 
@@ -103,19 +104,38 @@ curl -v --max-time 10 http://<upstream-host>:<port>/
 
 A reachable TCP port does not prove the application can produce a valid response within the required time.
 
-## 6. Only tune buffers when the logs prove a header/buffer problem
+## 6. Oversized upstream headers
 
-Large authentication cookies or response headers can require larger proxy buffers, but this should be evidence-driven.
+In one validated incident, OAuth/JWT-related response headers exceeded the default Nginx proxy buffer capacity and the error log explicitly reported:
 
-If Nginx explicitly logs errors such as `upstream sent too big header`, a controlled example is:
-
-```nginx
-proxy_buffer_size 16k;
-proxy_buffers 8 16k;
-proxy_busy_buffers_size 32k;
+```text
+upstream sent too big header while reading response header from upstream
 ```
 
-The correct values depend on observed header size and workload. Avoid copying very large buffer values as a universal fix; they increase per-request memory use and can hide an application-side problem.
+The working environment was tuned with:
+
+```nginx
+proxy_buffer_size 128k;
+proxy_buffers 4 256k;
+proxy_busy_buffers_size 256k;
+```
+
+Persistent backend connections were also configured:
+
+```nginx
+upstream backend_services {
+    server <backend-host>:<port>;
+    keepalive 32;
+}
+
+location /api/ {
+    proxy_pass http://backend_services;
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+}
+```
+
+These values record the actual incident resolution; they are not universal defaults. For another environment, size buffers from observed header size and concurrency because oversized per-request buffers increase memory consumption.
 
 ## 7. Only tune timeouts when upstream latency is expected
 
