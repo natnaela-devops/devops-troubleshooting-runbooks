@@ -1,6 +1,6 @@
 # Kafka consumer lag and repeated rebalancing under slow processing
 
-This runbook documents a real consumer-group incident where lag grew during burst traffic and workers repeatedly rebalanced because record processing took too long between polls.
+During a Kafka consumer issue, lag grew during bursts and group members rebalanced while workers were busy with database processing. I treated the broker and consumer as separate parts of the problem: poll cadence, batch size and available partitions mattered as much as broker health.
 
 ## Symptoms
 
@@ -11,7 +11,7 @@ This runbook documents a real consumer-group incident where lag grew during burs
 
 ## Root cause
 
-The consumers were doing enough work per poll that processing sometimes exceeded `max.poll.interval.ms`. Kafka then treated the consumer as unhealthy for group-management purposes and triggered rebalancing. A low partition count also limited useful parallelism.
+The consumers were doing enough work per poll that processing sometimes exceeded `max.poll.interval.ms`. Exceeding `max.poll.interval.ms` can cause the consumer to lose its assignment and trigger a rebalance even if heartbeat/session settings look healthy. Heartbeats do not override the maximum interval between polls. A low partition count also limited useful parallelism.
 
 ## Remediation used
 
