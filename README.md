@@ -1,6 +1,6 @@
 # DevOps Troubleshooting Runbooks
 
-Practical troubleshooting and recovery runbooks built from real DevOps/SRE work across Linux, Kafka/KRaft, Kubernetes/RKE2, Java, Redis, databases, authentication, storage, observability, networking, automation, and service operations.
+I keep these notes because I don't want to solve the same problem twice. They cover failures I've diagnosed or investigated in Kubernetes/RKE2, Linux, Kafka, Redis, Java services, databases and observability. Some entries are full recoveries; others document how to narrow a problem down without guessing at the cause.
 
 > Sensitive infrastructure details, internal IPs, credentials, certificate material, and organization-specific identifiers are intentionally replaced with placeholders.
 
@@ -111,7 +111,7 @@ This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn,
 - [Kafka SCRAM client properties](templates/kafka-client.properties.example)
 - [Kafka mTLS client properties](templates/kafka-mtls-client.properties.example)
 
-## Principles used in these runbooks
+## Checks I try not to skip
 
 - Inspect before changing.
 - Back up configuration before edits.
@@ -142,6 +142,6 @@ The repository covers both common client authentication patterns:
 
 Choose the model required by the application and security architecture rather than mixing the two unintentionally.
 
-## Expansion plan
+## What I'm still documenting
 
 This repository is a sanitized record of real troubleshooting patterns encountered in day-to-day DevOps/SRE work. Additional cases are generalized only when enough evidence exists to document the diagnosis and recovery accurately without exposing private infrastructure details.
