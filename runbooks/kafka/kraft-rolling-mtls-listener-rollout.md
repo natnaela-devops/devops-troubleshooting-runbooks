@@ -1,6 +1,6 @@
 # Kafka KRaft: Rolling mTLS Listener Rollout
 
-This runbook documents a production-safe pattern for adding a dedicated mutual-TLS listener to an existing three-node Kafka KRaft cluster while preserving existing listeners during migration.
+I used a rolling change to add an application mTLS listener to a three-node KRaft cluster without removing the old listener first. The difficult part was not just enabling SSL on brokers: the Java client properties, PKCS12/JKS files, certificate identities and consumer behavior all had to agree. This is the procedure and verification checklist from that work, with addresses and secrets removed.
 
 > All addresses, ports, credentials, certificate material, cluster identifiers, and organization-specific names must remain environment-specific and must not be committed to source control.
 
@@ -26,7 +26,7 @@ ssl.keystore.type=PKCS12
 ssl.truststore.location=/etc/kafka/ssl/truststore.p12
 ssl.truststore.password=<secret>
 ssl.truststore.type=PKCS12
-ssl.client.auth=required
+listener.name.mtls.ssl.client.auth=required
 ssl.enabled.protocols=TLSv1.2,TLSv1.3
 ```
 
@@ -144,7 +144,7 @@ CONNECTION ESTABLISHED
 Verification: OK
 ```
 
-This proves network reachability, server trust, client identity, and endpoint verification independently of the application framework.
+A successful `s_client` connection supports TLS trust and the presented certificate path, but it does not by itself prove Kafka authorization, successful produce/consume, or even that the broker required a client certificate. Test a client *without* a certificate as a separate negative case. Use `-verify_hostname <broker-dns>` when connecting by DNS, or `-verify_ip <broker-ip>` when verifying an IP SAN.
 
 ## 8. Distinguish broker TLS health from application configuration
 
@@ -178,7 +178,7 @@ can make the later `PLAINTEXT` value effective and cause the application to send
 
 ## 9. Rebuild a PKCS12 container without reissuing the certificate
 
-If the certificate and private key still exist and match, but the PKCS12 password is unknown, verify the key pair first:
+If the certificate and private key still exist and match, but the PKCS12 password is unknown, verify that they belong together first. The modulus check below works for RSA keys; for EC or other keys, compare the public-key fingerprints instead:
 
 ```bash
 openssl x509 -noout -modulus -in client.crt | openssl sha256
