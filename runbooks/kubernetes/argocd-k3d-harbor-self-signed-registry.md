@@ -1,6 +1,6 @@
 # Argo CD / k3d deployment failures with a self-signed Harbor registry
 
-This runbook documents a real local GitOps failure where applications managed by Argo CD could not start because k3d/containerd did not trust the TLS certificate used by a self-hosted Harbor registry.
+In a local k3d/Argo CD lab, images were present in Harbor but the Kubernetes nodes could not pull them. The useful clue was `x509: certificate signed by unknown authority` in the pod events. I fixed the node-side registry trust setup and configured namespace pull credentials separately.
 
 ## Symptoms
 
@@ -36,7 +36,7 @@ configs:
       ca_file: /etc/ssl/certs/harbor-ca.crt
 ```
 
-The actual CA path must exist inside the k3d node/containerd execution environment, not only on the host workstation.
+The CA file path must resolve inside the k3d node/containerd environment, not just on the host workstation. k3d registry config has to be applied when the cluster/nodes are created, or through a supported node configuration change; editing an unused local file will not change running containerd trust.
 
 ## Create namespace-scoped registry credentials
 
