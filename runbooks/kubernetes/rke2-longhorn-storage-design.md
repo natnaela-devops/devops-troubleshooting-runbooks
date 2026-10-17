@@ -1,6 +1,6 @@
 # RKE2 + Longhorn Storage Design Guide
 
-This guide explains when Longhorn is useful, why host-local storage behaves differently, and how to design storage for a fresh RKE2 cluster.
+After troubleshooting RKE2 and Longhorn incidents, I wanted a clear answer to a practical question: what should live on the host disk, and what should Longhorn replicate? This is the storage layout and installation order I use as a reference for new clusters.
 
 ## Why Longhorn exists
 
@@ -27,7 +27,7 @@ Longhorn volume
  `---- replica on node-3
 ```
 
-If one node fails, Kubernetes can reschedule the workload and Longhorn can attach the logical volume using surviving replicas.
+If one node fails, Kubernetes may reschedule the workload and Longhorn can reattach the logical volume from surviving healthy replicas, subject to quorum/replica health, scheduling and recovery conditions.
 
 ## When to use Longhorn
 
@@ -105,7 +105,7 @@ When etcd, containerd, applications, and Longhorn all compete for one disk, a st
 
 ## Preparing the Longhorn disk
 
-Example only; adapt filesystem, device name, and mount options to the environment.
+**Destructive example:** `mkfs.ext4` erases the selected filesystem. Confirm the correct unused disk with `lsblk -f`, check that it is not mounted or holding data, and obtain change approval/backups before formatting. Adapt filesystem, device name and mount options to the environment.
 
 ```bash
 mkfs.ext4 /dev/sdb
