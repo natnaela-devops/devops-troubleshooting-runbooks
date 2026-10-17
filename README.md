@@ -58,6 +58,7 @@ This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn,
 ## Identity / Keycloak
 
 - [Keycloak startup failure caused by installation-directory ownership](runbooks/keycloak/keycloak-data-directory-permission-startup.md)
+- [Keycloak behind Nginx: redirect loops, wrong scheme, and proxy-header failures](runbooks/keycloak/keycloak-nginx-reverse-proxy-redirect-loop.md)
 
 ## Redis
 
@@ -83,6 +84,7 @@ This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn,
 
 - [FortiVPN certificate, routing, and DNS troubleshooting](runbooks/networking/fortivpn-certificate-and-dns-troubleshooting.md)
 - [Repeated SMPP bind timeout: network reachability vs application retry](runbooks/networking/smpp-bind-timeout-network-triage.md)
+- [Nginx 502/504 upstream failures and SELinux connection denials](runbooks/networking/nginx-502-504-selinux-upstream-triage.md)
 
 ## Linux
 
