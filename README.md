@@ -59,6 +59,7 @@ This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn,
 ## Java / Spring Boot
 
 - [Java runtime version mismatch and unresolved Spring placeholders](runbooks/java/java-version-and-spring-placeholder-errors.md)
+- [Spring Boot Kafka property mismatch and Camel Netty port conflict](runbooks/java/spring-boot-kafka-property-mismatch-camel-port-conflict.md)
 - [Run a Java JAR with an environment file and nohup](runbooks/java/run-jar-with-env-file-and-nohup.md)
 - [Trace a Java payment rollback to a missing required request field](runbooks/java/payment-rollback-missing-required-field.md)
 
