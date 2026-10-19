@@ -76,6 +76,7 @@ This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn,
 
 ## Databases
 
+- [RCA: PostgreSQL logical decoding disabled breaks Flink CDC rule broadcasting](runbooks/database/postgresql-flink-cdc-wal-level-rca.md)
 - [Oracle object resolution and view inspection](runbooks/database/oracle-object-resolution-and-view-inspection.md)
 - [Oracle phone-number normalization for lookup troubleshooting](runbooks/database/oracle-phone-number-normalization.md)
 - [YugabyteDB YSQL Not Ready troubleshooting](runbooks/database/yugabytedb-ysql-not-ready.md)
