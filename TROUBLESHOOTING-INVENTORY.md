@@ -13,6 +13,7 @@ These runbooks were added after the original inventory and are linked here so th
 | Keycloak reverse-proxy HTTPS redirects | [Keycloak behind Nginx](runbooks/keycloak/keycloak-nginx-reverse-proxy-redirect-loop.md) |
 | Keycloak startup and systemd service management | [Keycloak systemd](runbooks/keycloak/keycloak-systemd-service.md) |
 | Nginx upstream response-header size and SELinux upstream denials | [Nginx 502/504 triage](runbooks/networking/nginx-502-504-selinux-upstream-triage.md) |
+| Edge DNS naming mismatch, public IP/NAT timeout, TLS and receipt download restrictions | [Nginx DNS/NAT/TLS receipt controls](runbooks/networking/nginx-dns-nat-tls-receipt-restrictions.md) |
 | Kafka consumer lag and rebalance under slow database processing | [Consumer lag](runbooks/kafka/consumer-lag-rebalancing-under-slow-processing.md) |
 | Oracle-to-Redis sync connection exhaustion | [Sync worker backpressure](runbooks/automation/oracle-redis-sync-backpressure.md) |
 | OpenSearch disk pressure and ISM lifecycle | [OpenSearch storage](runbooks/observability/opensearch-ism-storage-and-unassigned-shards.md) |
