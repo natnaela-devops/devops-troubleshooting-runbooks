@@ -95,6 +95,7 @@ This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn,
 - [FortiVPN certificate, routing, and DNS troubleshooting](runbooks/networking/fortivpn-certificate-and-dns-troubleshooting.md)
 - [Repeated SMPP bind timeout: network reachability vs application retry](runbooks/networking/smpp-bind-timeout-network-triage.md)
 - [Nginx 502/504 upstream failures and SELinux connection denials](runbooks/networking/nginx-502-504-selinux-upstream-triage.md)
+- [Nginx edge delivery: DNS/NAT/TLS, read-only receipt routing, and signed-link verification gate](runbooks/networking/nginx-dns-nat-tls-receipt-restrictions.md)
 
 ## Linux
 
