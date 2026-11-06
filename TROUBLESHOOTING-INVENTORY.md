@@ -62,6 +62,7 @@ These runbooks were added after the original inventory and are linked here so th
 | Spring placeholder such as `${VAR}` reaches runtime unresolved | Documented | Same runbook |
 | JAR launched from sourced environment file with `nohup` and redirected logs | Documented | `runbooks/java/run-jar-with-env-file-and-nohup.md` |
 | Java payment transaction rolled back because required `phoneNumber` was null/missing | Documented | `runbooks/java/payment-rollback-missing-required-field.md` |
+| Partner TLS cert trusted via system CA store on distro JDK but not reaching `cacerts` on tarball JDK; custom `-Djavax.net.ssl.trustStore` overriding `cacerts` | Documented | `runbooks/java/trust-partner-tls-cert-distro-vs-tarball-jdk.md` |
 | Redis property-prefix compatibility (`spring.data.redis.*` vs older naming) | Investigated | Keep application-version specific; no generalized fix claimed |
 | Merchant approval ended with application error code after DB lookup and Keycloak-user attempt | Investigated, unresolved | Keep in inventory until response status/source decision path is captured |
 | OpenSearch-backed log viewer exited because `OPENSEARCH_PASSWORD` placeholder was unresolved | Confirmed | General unresolved-placeholder pattern already documented |

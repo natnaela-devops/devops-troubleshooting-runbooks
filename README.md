@@ -62,6 +62,7 @@ This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn,
 - [Spring Boot Kafka property mismatch and Camel Netty port conflict](runbooks/java/spring-boot-kafka-property-mismatch-camel-port-conflict.md)
 - [Run a Java JAR with an environment file and nohup](runbooks/java/run-jar-with-env-file-and-nohup.md)
 - [Trace a Java payment rollback to a missing required request field](runbooks/java/payment-rollback-missing-required-field.md)
+- [Trust a partner TLS certificate in Java: distro JDK vs tarball JDK](runbooks/java/trust-partner-tls-cert-distro-vs-tarball-jdk.md)
 
 ## Identity / Keycloak
 
