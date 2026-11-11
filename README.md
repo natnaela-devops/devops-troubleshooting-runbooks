@@ -9,9 +9,8 @@ See the [Troubleshooting Inventory](TROUBLESHOOTING-INVENTORY.md) for the broade
 ## Production case study
 
 - [Banking digital platform infrastructure — primary case study](https://github.com/natnaela-devops/banking-digital-platform-infrastructure)
-- [Archived background notes in this repository](projects/banking-digital-platform-infrastructure/README.md)
 
-The dedicated banking infrastructure repository is the primary maintained case study. The local copy is retained as older background material so it does not compete with the newer version.
+The dedicated banking infrastructure repository is the maintained case study; the older copy that used to live in this repository has been removed in its favour.
 
 This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn, Harbor, Kafka/KRaft, Redis Cluster + Predixy, YugabyteDB, TimescaleDB, Keycloak, Nginx, SeaweedFS, PM2, OpenSearch, Prometheus/Alertmanager, and related application integrations. It documents the engineering scope and operational methods without publishing customer-specific infrastructure.
 
@@ -46,6 +45,7 @@ This case study summarizes hands-on platform work across RKE2/Rancher, Longhorn,
 - [Audit stale dependency endpoints across namespaces](runbooks/kubernetes/cross-namespace-config-audit.md)
 - [Longhorn PVCs stuck Terminating because of stale admission webhooks](runbooks/kubernetes/longhorn-stale-webhook-pvc-terminating.md)
 - [Rancher/Kubernetes binary Secret double-Base64 troubleshooting](runbooks/kubernetes/rancher-binary-secret-double-base64.md)
+- [USSD gateway: Docker ENTRYPOINT overrides ConfigMap values](runbooks/kubernetes/ussd-gateway-env-override-keycloak-timeout.md)
 
 ## Observability
 

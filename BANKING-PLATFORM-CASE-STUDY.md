@@ -72,8 +72,8 @@ Typical changes followed this pattern:
 
 ## Detailed documentation
 
-- [Full banking platform case study](projects/banking-digital-platform-infrastructure/README.md)
-- [Layered architecture](projects/banking-digital-platform-infrastructure/architecture.md)
+- [Full banking platform case study](https://github.com/natnaela-devops/banking-digital-platform-infrastructure)
+- [Layered architecture](https://github.com/natnaela-devops/banking-digital-platform-infrastructure/blob/main/docs/architecture.md)
 - [Kafka mTLS migration architecture](runbooks/kafka/kafka-mtls-migration-architecture.md)
 - [Kafka rolling mTLS rollout](runbooks/kafka/kraft-rolling-mtls-listener-rollout.md)
 - [Redis Cluster + Predixy architecture](runbooks/redis/redis-cluster-predixy-architecture.md)

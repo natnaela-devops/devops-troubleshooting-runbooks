@@ -32,6 +32,8 @@ These runbooks were added after the original inventory and are linked here so th
 | Redis Cluster `MOVED` redirects not reachable through Service design | Documented | `runbooks/kubernetes/redis-cluster-moved-service-exposure.md` |
 | Stale dependency endpoints across ConfigMaps/namespaces | Documented | `runbooks/kubernetes/cross-namespace-config-audit.md` |
 | Longhorn PVCs stuck Terminating because stale webhooks referenced a missing admission service | Documented | `runbooks/kubernetes/longhorn-stale-webhook-pvc-terminating.md` |
+| Binary Secret double-Base64 encoded when created through Rancher | Documented | `runbooks/kubernetes/rancher-binary-secret-double-base64.md` |
+| USSD gateway image `ENTRYPOINT` overrode ConfigMap values, surfacing as a Keycloak timeout | Documented | `runbooks/kubernetes/ussd-gateway-env-override-keycloak-timeout.md` |
 | RKE2/containerd runtime inspection using the RKE2 containerd socket | Confirmed operational pattern | Covered by related RKE2/container runbooks |
 | Low-memory three-node cluster with multiple stateful/platform workloads | Confirmed | Covered by resource/I/O runbook |
 | Longhorn/RKE2 filesystem pressure, especially `/var/lib/rancher` | Confirmed | Covered by resource/I/O runbook |
@@ -63,6 +65,7 @@ These runbooks were added after the original inventory and are linked here so th
 | JAR launched from sourced environment file with `nohup` and redirected logs | Documented | `runbooks/java/run-jar-with-env-file-and-nohup.md` |
 | Java payment transaction rolled back because required `phoneNumber` was null/missing | Documented | `runbooks/java/payment-rollback-missing-required-field.md` |
 | Partner TLS cert trusted via system CA store on distro JDK but not reaching `cacerts` on tarball JDK; custom `-Djavax.net.ssl.trustStore` overriding `cacerts` | Documented | `runbooks/java/trust-partner-tls-cert-distro-vs-tarball-jdk.md` |
+| Spring Boot Kafka property mismatch and Camel Netty port conflict | Documented | `runbooks/java/spring-boot-kafka-property-mismatch-camel-port-conflict.md` |
 | Redis property-prefix compatibility (`spring.data.redis.*` vs older naming) | Investigated | Keep application-version specific; no generalized fix claimed |
 | Merchant approval ended with application error code after DB lookup and Keycloak-user attempt | Investigated, unresolved | Keep in inventory until response status/source decision path is captured |
 | OpenSearch-backed log viewer exited because `OPENSEARCH_PASSWORD` placeholder was unresolved | Confirmed | General unresolved-placeholder pattern already documented |
@@ -104,6 +107,7 @@ These runbooks were added after the original inventory and are linked here so th
 | YugabyteDB YSQL Not Ready / PostgreSQL initialization issue | Documented | `runbooks/database/yugabytedb-ysql-not-ready.md` |
 | Flyway migration history inspected to verify actual installed migrations | Documented | `runbooks/database/flyway-migration-history-verification.md` |
 | MySQL local socket missing because server startup hit `Permission denied` | Documented investigation; final exact denial source unresolved | `runbooks/database/mysql-socket-permission-denied-startup.md` |
+| Flink CDC rule broadcaster failed because PostgreSQL logical decoding (`wal_level`) was disabled | Documented RCA | `runbooks/database/postgresql-flink-cdc-wal-level-rca.md` |
 | Oracle client/SQL*Plus connectivity from Ubuntu | Confirmed operational troubleshooting | Generalize further only with complete connection-failure evidence |
 | PACS integration marker inspected directly in PostgreSQL during AtomFeed troubleshooting | Confirmed application/database troubleshooting | Await standalone integration runbook |
 
@@ -116,6 +120,7 @@ These runbooks were added after the original inventory and are linked here so th
 | Custom Predixy image built to reproduce Redis proxy behavior | Documented | Predixy lab runbook |
 | Harbor image push returned HTTP 500 while UI/components were otherwise healthy | Documented investigation pattern | `runbooks/docker/harbor-push-http500-object-storage-endpoint.md` |
 | S3-compatible object-store console endpoint confused with API endpoint | Documented | Same runbook |
+| Java 17 application image built on a host without internet access | Documented | `runbooks/docker/offline-java17-image-build.md` |
 
 ## Observability
 
@@ -163,6 +168,27 @@ These runbooks were added after the original inventory and are linked here so th
 | OpenELIS/AtomFeed encounter failed because patient UUID was absent in downstream system | Investigated | POST endpoint test returned method-not-supported; GET path test produced integer conversion failure |
 | PACS AtomFeed reported missing last-read entry; marker table inspected and feed reset attempted | Investigated | Processing resumed far enough to expose a later DICOM conversion failure |
 | HL7-to-DICOM conversion failed because an expected XSL stylesheet was missing | Investigated, unresolved in retrieved evidence | Strong candidate for a dedicated integration runbook |
+
+## Procedures and design guides
+
+These are rollout procedures and design notes rather than incident write-ups. They are listed so every published runbook appears in this inventory.
+
+| Topic | Runbook |
+|---|---|
+| Kafka KRaft: add SCRAM-SHA-512 authentication | `runbooks/kafka/kraft-scram-authentication.md` |
+| Kafka SCRAM authentication validation | `runbooks/kafka/scram-validation.md` |
+| Spring Boot Kafka client with SCRAM-SHA-512 | `runbooks/kafka/spring-boot-client-config.md` |
+| Kafka KRaft: safe listener and controller port migration | `runbooks/kafka/kraft-port-migration.md` |
+| Kafka mTLS migration architecture | `runbooks/kafka/kafka-mtls-migration-architecture.md` |
+| Kafka KRaft: rolling mTLS listener rollout | `runbooks/kafka/kraft-rolling-mtls-listener-rollout.md` |
+| Kafka mTLS client authentication with PKCS12 | `runbooks/kafka/mtls-client-authentication.md` |
+| RKE2 application Kafka mTLS client with JKS | `runbooks/kafka/rke2-jks-mtls-client.md` |
+| RKE2 application Kafka mTLS client with PKCS12 | `runbooks/kafka/rke2-pkcs12-mtls-client.md` |
+| WildFly Kafka client migration to mTLS | `runbooks/kafka/wildfly-mtls-client-migration.md` |
+| Legacy Kafka listener retirement after mTLS migration | `runbooks/kafka/legacy-listener-retirement.md` |
+| Redis Cluster and Predixy architecture | `runbooks/redis/redis-cluster-predixy-architecture.md` |
+| RKE2 + Longhorn storage design | `runbooks/kubernetes/rke2-longhorn-storage-design.md` |
+| RKE2 production features and hardening | `runbooks/kubernetes/rke2-production-features-and-hardening.md` |
 
 ## Publication rule
 
